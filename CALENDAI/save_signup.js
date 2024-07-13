@@ -10,33 +10,39 @@ import {
   Alert,
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/native'; // Importer useNavigation
 import axios from 'axios';
 
-export default function Login() {
+export default function SignUp() {
   const [form, setForm] = useState({
+    firstName: '',
+    lastName: '',
     email: '',
     password: '',
   });
 
-  const navigation = useNavigation();
+  const navigation = useNavigation(); // Initialiser useNavigation
 
-  const handleLogin = () => {
-    const { email, password } = form;
-    if (email && password) {
-      axios.post('http://10.0.2.2:3000/login', {
-        email,
-        password,
-      })
-      .then(response => {
-        navigation.replace('Main', { screen: 'Agenda' });
-      })
-      .catch(error => {
-        Alert.alert('Erreur lors de la connexion :', error.message);
-      });
-    } else {
-      Alert.alert('Veuillez fournir un email et un mot de passe.');
+  const handleSignup = () => {
+    const { firstName, lastName, email, password } = form;
+    if (!firstName || !lastName || !email || !password) {
+      Alert.alert('Veuillez remplir tous les champs.');
+      return;
     }
+
+    axios.post('http://10.0.2.2:3000/signup', {
+      firstName,
+      lastName,
+      email,
+      password,
+    })
+    .then(response => {
+      Alert.alert('Compte créé avec succès !');
+      navigation.navigate('Login'); // Redirection vers Login après succès
+    })
+    .catch(error => {
+      Alert.alert('Erreur lors de la création du compte :', error.message);
+    });
   };
 
   return (
@@ -51,7 +57,7 @@ export default function Login() {
               source={require('./icons/Logo.jpg')} />
 
             <Text style={styles.title}>
-              Sign in to <Text style={{ color: '#075eec' }}>CALENDAI</Text>
+              Sign up to <Text style={{ color: '#075eec' }}>CALENDAI</Text>
             </Text>
 
             <Text style={styles.subtitle}>
@@ -60,6 +66,34 @@ export default function Login() {
           </View>
 
           <View style={styles.form}>
+            <View style={styles.input}>
+              <Text style={styles.inputLabel}>First Name</Text>
+
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                clearButtonMode="while-editing"
+                onChangeText={firstName => setForm({ ...form, firstName })}
+                placeholder="John"
+                placeholderTextColor="#6b7280"
+                style={styles.inputControl}
+                value={form.firstName} />
+            </View>
+
+            <View style={styles.input}>
+              <Text style={styles.inputLabel}>Last Name</Text>
+
+              <TextInput
+                autoCapitalize="none"
+                autoCorrect={false}
+                clearButtonMode="while-editing"
+                onChangeText={lastName => setForm({ ...form, lastName })}
+                placeholder="Doe"
+                placeholderTextColor="#6b7280"
+                style={styles.inputControl}
+                value={form.lastName} />
+            </View>
+
             <View style={styles.input}>
               <Text style={styles.inputLabel}>Email address</Text>
 
@@ -91,25 +125,23 @@ export default function Login() {
 
             <View style={styles.formAction}>
               <TouchableOpacity
-                onPress={handleLogin}>
+                onPress={handleSignup}>
                 <View style={styles.btn}>
-                  <Text style={styles.btnText}>Sign in</Text>
+                  <Text style={styles.btnText}>Sign up</Text>
                 </View>
               </TouchableOpacity>
             </View>
-
-            <Text style={styles.formLink}>Forgot password?</Text>
           </View>
         </KeyboardAwareScrollView>
 
         <TouchableOpacity
           onPress={() => {
-            navigation.navigate('SignUp');
+            navigation.navigate('Login');
           }}
           style={{ marginTop: 'auto' }}>
           <Text style={styles.formFooter}>
-            Don't have an account?{' '}
-            <Text style={{ textDecorationLine: 'underline' }}>Sign up</Text>
+            Already have an account?{' '}
+            <Text style={{ textDecorationLine: 'underline' }}>Sign in</Text>
           </Text>
         </TouchableOpacity>
       </View>
@@ -158,18 +190,18 @@ const styles = StyleSheet.create({
     marginTop: 4,
     marginBottom: 16,
   },
-  formLink: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#075eec',
-    textAlign: 'center',
-  },
   formFooter: {
     fontSize: 15,
     fontWeight: '600',
     color: '#222',
     textAlign: 'center',
     letterSpacing: 0.15,
+  },
+  formLink: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#075eec',
+    textAlign: 'center',
   },
   input: {
     marginBottom: 16,
