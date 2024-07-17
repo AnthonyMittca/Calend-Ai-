@@ -47,7 +47,7 @@ const AgendaScreen = () => {
         }
         formattedItems[date].push({
           name: course.matiere, // Utilisez l'intitulé de la matière
-          note: `Intervenant: ${course.intervenant_nom} ${course.intervenant_prenom} \nSalle: ${course.numero_salle}`,
+          note: `Intervenant: ${course.intervenant_nom} ${course.intervenant_prenom} Salle: ${course.numero_salle}`,
           heure_debut: course.heure_debut,
           heure_fin: course.heure_fin,
           height: Math.max(50, Math.floor(Math.random() * 150)),

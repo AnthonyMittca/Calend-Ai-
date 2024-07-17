@@ -49,7 +49,7 @@ app.post('/login', (req, res) => {
     return res.status(400).json({ error: 'Veuillez fournir un email et un mot de passe.' });
   }
 
-  const query = 'SELECT * FROM users WHERE email = ? AND password = ?';
+  const query = 'SELECT id FROM users WHERE email = ? AND password = ?';
   db.query(query, [email, password], (err, result) => {
     if (err) {
       console.error('Erreur lors de la connexion:', err);
@@ -58,7 +58,27 @@ app.post('/login', (req, res) => {
     if (result.length === 0) {
       return res.status(401).json({ error: 'Email ou mot de passe incorrect.' });
     }
-    res.status(200).json({ message: 'Connexion réussie!' });
+    const userId = result[0].id;
+    res.status(200).json({ message: 'Connexion réussie!', userId });
+  });
+});
+
+app.get('/loginID/:id', (req, res) => {
+  const userId = req.params.id;
+  const query = 'SELECT firstName FROM users WHERE id = ?';
+
+  db.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des données utilisateur :', err);
+      res.status(500).json({ error: 'Erreur serveur' });
+    } else {
+      if (results.length > 0) {
+        const user = results[0];
+        res.json(user);
+      } else {
+        res.status(404).json({ error: 'Utilisateur non trouvé' });
+      }
+    }
   });
 });
 
