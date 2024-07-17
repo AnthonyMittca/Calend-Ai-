@@ -51,6 +51,36 @@ app.post('/login-myges', (req, res) => {
   });
 });
 
+app.get('/cours', (req, res) => {
+  const query = `
+    SELECT 
+      c.id AS id_cours,
+      m.intitule AS matiere,
+      i.nom AS intervenant_nom,
+      i.prenom AS intervenant_prenom,
+      p.intitule AS promotion,
+      s.numero_salle AS numero_salle,
+      c.date_debut AS date_debut,
+      c.date_fin AS date_fin,
+      c.heure_debut AS heure_debut,
+      c.heure_fin AS heure_fin
+    FROM cours c
+    JOIN matiere m ON c.matiere = m.id
+    JOIN intervenant i ON c.intervenant = i.id
+    JOIN promotion p ON c.promotion = p.id
+    JOIN salle s ON c.numero_salle = s.id
+  `;
+
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Erreur lors de la récupération des cours:', err);
+      return res.status(500).json({ error: 'Erreur lors de la récupération des cours.' });
+    }
+    console.log('Cours récupérés avec succès:', results);
+    res.status(200).json(results);
+  });
+});
+
 
 app.listen(port, () => {
   console.log(`Serveur backend myGes démarré sur http://localhost:${port}`);

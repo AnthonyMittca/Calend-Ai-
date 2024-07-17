@@ -18,6 +18,7 @@ export default function Login() {
     email: '',
     password: '',
   });
+  const [user, setUser] = useState(null); // State pour stocker les informations de l'utilisateur
 
   const navigation = useNavigation();
 
@@ -29,9 +30,26 @@ export default function Login() {
         password,
       })
       .then(response => {
-        navigation.replace('Main', { screen: 'Agenda' });
+        // Récupérer l'ID de l'utilisateur à partir de la réponse
+        const userId = response.data.userId;
+        console.log('User ID:', userId); // Log User ID
+      
+        // Récupérer les informations de l'utilisateur en utilisant l'ID de l'utilisateur
+        axios.get(`http://10.0.2.2:3000/loginID/${userId}`)
+          .then(response => {
+            console.log('User Data:', response.data); // Log User Data
+            setUser(response.data);
+
+            // Naviguer vers le ProfilScreen avec les informations utilisateur
+            navigation.replace('Main', { screen: 'Profil', params: { user: response.data } });
+          })
+          .catch(error => {
+            console.error('Erreur lors de la récupération des informations utilisateur:', error.message);
+            Alert.alert('Erreur lors de la récupération des informations utilisateur :', error.message);
+          });
       })
       .catch(error => {
+        console.error('Erreur lors de la connexion:', error.message);
         Alert.alert('Erreur lors de la connexion :', error.message);
       });
     } else {
@@ -98,7 +116,7 @@ export default function Login() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.formLink}>Forgot password?</Text>
+          
           </View>
         </KeyboardAwareScrollView>
 
@@ -108,22 +126,22 @@ export default function Login() {
           }}
           style={{ marginTop: 'auto' }}>
           <Text style={styles.formFooter}>
-            Don't have an account?{' '}
+            Vous n'avez toujours pas de compte ?{'\n'}
             <Text style={{ textDecorationLine: 'underline' }}>Sign up</Text>
           </Text>
         </TouchableOpacity>
       </View>
+    
+    
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    flex: 1,
     paddingVertical: 24,
     paddingHorizontal: 0,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
   },
   title: {
     fontSize: 31,
@@ -150,9 +168,6 @@ const styles = StyleSheet.create({
   form: {
     marginBottom: 24,
     paddingHorizontal: 24,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 0,
   },
   formAction: {
     marginTop: 4,
@@ -208,5 +223,12 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     color: '#fff',
+  },
+  userInfo: {
+    backgroundColor: '#fff',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    marginTop: 16,
+    alignItems: 'center',
   },
 });
